@@ -14,10 +14,39 @@ require("dotenv").config({ path: "./config/.env" });
 //Connect To Database
 connectDB();
 
-app.get("/", async (req, res) => {
-  const response = await noteModel.find();
-  res.json({ notes: response });
+// app.get("/", async (req, res) => {
+//   const response = await noteModel.find();
+//   res.json({ notes: response });
+// });
+app.get("/", (request, response) => {
+  noteModel.find({}).then((notes) => {
+    response.json(notes);
+  });
 });
+
+app.get("/api/notes/:id", async (request, response) => {
+  const id = request.params.id;
+  console.log("id", id);
+  const note = await noteModel.find({ _id: request.params.id });
+  console.log("note", note);
+  // response.json(note);
+  if (note) {
+    response.json(note);
+  } else {
+    response.status(404).end();
+  }
+});
+app.delete("/api/notes/:id", async (request, response) => {
+  const id = request.params.id;
+  await noteModel.findByIdAndDelete({ _id: request.params.id });
+
+  response.status(204).end();
+});
+// app.post('/api/notes', (request, response) => {
+//   const note = request.body
+//   console.log(note)
+//   response.json(note)
+// })
 
 //Server Running
 app.listen(process.env.PORT, () => {
