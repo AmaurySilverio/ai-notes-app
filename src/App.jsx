@@ -3,6 +3,7 @@ import Button from "./components/Button";
 import Note from "./components/Note";
 import axios from "axios";
 import noteService from "./services/notes";
+import spellCheckService from "./services/spellCheck";
 
 function App() {
   // const [notes, setNotes] = useState([]);
@@ -57,6 +58,16 @@ function App() {
     //   setNotes(notes.filter(n => n.id !== id))
     // })
   };
+  const deleteNote = (id) => {
+    noteService.deleteNote(id).then((response) => {
+      setNotes(notes.filter((note) => note.id !== id));
+    });
+  };
+  const spellCheckNote = (content) => {
+    spellCheckService.spellCheckNote(content).then((response) => {
+      console.log(response);
+    });
+  };
   return (
     <>
       {/* {items.map((i) => (
@@ -74,6 +85,8 @@ function App() {
             key={note.id}
             note={note}
             toggleImportance={() => toggleImportanceOf(note.id)}
+            deleteNote={() => deleteNote(note.id)}
+            spellCheck={() => spellCheckNote(note.content)}
           />
         ))}
       </ul>

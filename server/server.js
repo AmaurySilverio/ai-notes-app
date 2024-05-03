@@ -5,12 +5,24 @@ const noteModel = require("./models/Note");
 const cors = require("cors");
 // import connectDB from "../config/database";
 // const mongoose = require("mongoose");
-
-app.use(express.json());
-app.use(cors());
 //Use .env file in config folder
 require("dotenv").config({ path: "./config/.env" });
 
+const requestLogger = (request, response, next) => {
+  console.log("Method:", request.method);
+  console.log("Path:  ", request.path);
+  console.log("Body:  ", request.body);
+  console.log("---");
+  next();
+};
+app.use(express.json());
+app.use(cors());
+app.use(requestLogger);
+app.use(express.static("dist"));
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
 //Connect To Database
 connectDB();
 
@@ -42,11 +54,13 @@ app.delete("/api/notes/:id", async (request, response) => {
 
   response.status(204).end();
 });
-// app.post('/api/notes', (request, response) => {
-//   const note = request.body
-//   console.log(note)
-//   response.json(note)
-// })
+app.post("/api/notes", (request, response) => {
+  const note = request.body;
+  console.log(note);
+  response.json(note);
+});
+
+app.use(unknownEndpoint);
 
 //Server Running
 app.listen(process.env.PORT, () => {
